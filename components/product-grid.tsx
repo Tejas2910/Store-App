@@ -1,9 +1,11 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
+import Rating from '@mui/material/Rating' // Import MUI Rating
 
 interface Product {
   id: string
@@ -15,6 +17,7 @@ interface Product {
   description: string
   top_ingredients?: string
   tags?: string[]
+  rating?: number // Add rating property
 }
 
 interface ProductGridProps {
@@ -24,6 +27,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({ category, products }: ProductGridProps) {
   const [displayProducts, setDisplayProducts] = useState<Product[]>([])
+  const router = useRouter()
 
   useEffect(() => {
     if (products) {
@@ -295,6 +299,23 @@ export default function ProductGrid({ category, products }: ProductGridProps) {
                   {tag}
                 </Badge>
               ))}
+              {/* Rating: clickable, navigates to review page */}
+            <div
+              style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+              onClick={() => router.push(`/reviews/${product.id}`)}
+              title="See and add reviews"
+            >
+              <Rating
+                name={`rating-${product.id}`}
+                value={product.rating || 0}
+                precision={0.5}
+                readOnly
+                size="medium"
+              />
+              <span className="ml-2 text-sm text-blue-600 underline">
+                {product.rating ? product.rating.toFixed(1) : "No ratings"}
+              </span>
+            </div>
           </CardFooter>
         </Card>
       ))}

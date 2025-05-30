@@ -10,6 +10,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import docx
 import re
+from uuid import uuid4
 
 app = FastAPI()
 
@@ -146,6 +147,27 @@ product_data = [
     },
     # Add more products as needed
 ]
+
+app = FastAPI()
+
+# In-memory storage for demo; use a real database in production
+reviews = []
+
+class Review(BaseModel):
+    id: str
+    productId: str
+    rating: float
+    description: str
+
+@app.get("/api/reviews")
+async def get_reviews(productId: str):
+    return [r for r in reviews if r['productId'] == productId]
+
+@app.post("/api/reviews")
+async def add_review(review: Review):
+    review.id = str(uuid4())
+    reviews.append(review.dict())
+    return {"success": True, "review": review}
 
 # Load models and data at startup
 @app.on_event("startup")
